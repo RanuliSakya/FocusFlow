@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusFlow — Sign in</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/webfont/tabler-icons.min.css"/>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+
+  <!-- FocusFlow Styles -->
+  <link rel="stylesheet" href="css/tokens.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .ff-auth-page { min-height: 100vh; display: flex; flex-direction: column; background: var(--color-neutral-100); }
+    .ff-auth-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: var(--space-10) var(--space-6); }
+    .ff-auth-card { background: var(--color-white); border: 1px solid var(--color-neutral-200); border-radius: var(--radius-2xl); padding: 40px; width: 100%; max-width: 440px; box-shadow: var(--shadow-card); }
+    .ff-auth-title { font-size: var(--font-size-h2); font-weight: var(--font-weight-bold); color: var(--color-neutral-900); margin-bottom: 6px; }
+    .ff-auth-sub { font-size: var(--font-size-base); color: var(--color-neutral-500); }
+    .ff-forgot-link { font-size: var(--font-size-sm); color: var(--color-primary); text-decoration: none; font-weight: var(--font-weight-medium); }
+    .ff-forgot-link:hover { text-decoration: underline; }
+    .ff-auth-switch { text-align: center; font-size: var(--font-size-sm); color: var(--color-neutral-500); }
+    .ff-auth-switch a { color: var(--color-primary); text-decoration: none; font-weight: var(--font-weight-medium); }
+    .ff-auth-switch a:hover { text-decoration: underline; }
+    .error-banner { background: var(--color-error-bg); border: 1px solid var(--color-error); border-radius: var(--radius-md); padding: 10px 14px; font-size: var(--font-size-sm); color: var(--color-error); display: none; align-items: center; gap: 8px; margin-bottom: var(--space-4); }
+  </style>
+</head>
+<body>
+
+  <div class="ff-auth-page">
+
+    <!-- ── Navbar ─────────────────────────────────────────── -->
+    <nav class="ff-public-nav">
+      <a href="index.html" class="ff-public-logo">FocusFlow</a>
+      <div class="ff-public-nav-links">
+        <span style="font-size:13px;color:var(--color-neutral-500)">Don't have an account?</span>
+        <a href="signup.html" class="ff-btn ff-btn-primary" style="padding:8px 18px;font-size:13px">Sign up free</a>
+      </div>
+    </nav>
+
+    <!-- ── Auth body ──────────────────────────────────────── -->
+    <div class="ff-auth-body">
+      <div class="ff-auth-card ff-scale-in">
+
+        <!-- Header -->
+        <div class="mb-4">
+          <h1 class="ff-auth-title">Welcome back 👋</h1>
+          <p class="ff-auth-sub">Sign in to continue to FocusFlow</p>
+        </div>
+
+        <hr class="ff-divider ff-divider-sm"/>
+
+        <!-- Error banner -->
+        <div class="error-banner" id="errorBanner" role="alert">
+          <i class="ti ti-alert-circle" aria-hidden="true"></i>
+          <span id="errorMsg">Incorrect email or password.</span>
+        </div>
+
+        <!-- Form -->
+        <form id="signinForm" novalidate>
+
+          <div class="ff-form-group">
+            <label class="ff-form-label" for="email">Email address</label>
+            <input
+              class="ff-input"
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            />
+            <div class="ff-input-error-msg" id="emailError">Please enter a valid email address.</div>
+          </div>
+
+          <div class="ff-form-group">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="ff-form-label mb-0" for="password">Password</label>
+              <a href="#" class="ff-forgot-link">Forgot password?</a>
+            </div>
+            <div style="position:relative">
+              <input
+                class="ff-input"
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+                style="padding-right:44px"
+              />
+              <button
+                type="button"
+                id="togglePassword"
+                aria-label="Toggle password visibility"
+                style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-neutral-500);font-size:17px;padding:0;display:flex;align-items:center"
+              >
+                <i class="ti ti-eye" id="eyeIcon" aria-hidden="true"></i>
+              </button>
+            </div>
+            <div class="ff-input-error-msg" id="passwordError">Please enter your password.</div>
+          </div>
+
+          <button type="submit" class="ff-btn ff-btn-primary ff-btn-full mt-2" id="submitBtn">
+            Sign in
+          </button>
+
+        </form>
+
+        <hr class="ff-divider"/>
+
+        <p class="ff-auth-switch">
+          Don't have an account? <a href="signup.html">Sign up free</a>
+        </p>
+
+      </div>
+    </div>
+
+    <!-- ── Footer ─────────────────────────────────────────── -->
+    <footer class="ff-footer">
+      <div class="ff-footer-inner">
+        <div class="ff-footer-brand">
+          <span class="ff-footer-logo">FocusFlow</span>
+          <span class="ff-footer-copy">© 2026 FocusFlow. All rights reserved.</span>
+        </div>
+        <div class="ff-footer-links">
+          <a href="#" class="ff-footer-link">Privacy policy</a>
+          <div class="ff-footer-divider"></div>
+          <a href="#" class="ff-footer-link">Terms of use</a>
+          <div class="ff-footer-divider"></div>
+          <a href="#" class="ff-footer-link">Help</a>
+          <div class="ff-footer-divider"></div>
+          <a href="#" class="ff-footer-link">Contact</a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ── Scripts ───────────────────────────────────────────── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/tasks.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // Redirect if already signed in
+      FF.redirectIfAuthed();
+
+      const form          = document.getElementById('signinForm');
+      const emailInput    = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const emailError    = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+      const errorBanner   = document.getElementById('errorBanner');
+      const errorMsg      = document.getElementById('errorMsg');
+      const submitBtn     = document.getElementById('submitBtn');
+      const toggleBtn     = document.getElementById('togglePassword');
+      const eyeIcon       = document.getElementById('eyeIcon');
+
+      // ── Password visibility toggle ─────────────────────
+      toggleBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        eyeIcon.className  = isPassword ? 'ti ti-eye-off' : 'ti ti-eye';
+      });
+
+      // ── Inline validation helpers ──────────────────────
+      function showFieldError(input, errorEl, message) {
+        input.classList.add('ff-input-error');
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+      function clearFieldError(input, errorEl) {
+        input.classList.remove('ff-input-error');
+        errorEl.style.display = 'none';
+      }
+      function showBanner(message) {
+        errorMsg.textContent = message;
+        errorBanner.style.display = 'flex';
+      }
+      function hideBanner() {
+        errorBanner.style.display = 'none';
+      }
+
+      // Clear errors on input
+      emailInput.addEventListener('input',    () => { clearFieldError(emailInput,    emailError);    hideBanner(); });
+      passwordInput.addEventListener('input', () => { clearFieldError(passwordInput, passwordError); hideBanner(); });
+
+      // ── Form submission ────────────────────────────────
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        hideBanner();
+
+        let valid = true;
+        const email    = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showFieldError(emailInput, emailError, 'Please enter a valid email address.');
+          valid = false;
+        }
+        if (!password) {
+          showFieldError(passwordInput, passwordError, 'Please enter your password.');
+          valid = false;
+        }
+        if (!valid) return;
+
+        // Disable button during processing
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite" aria-hidden="true"></i> Signing in...';
+
+        setTimeout(() => {
+          const result = FF.signIn(email, password);
+          if (result.success) {
+            window.location.href = 'dashboard.html';
+          } else {
+            showBanner(result.error || 'Incorrect email or password.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Sign in';
+          }
+        }, 400);
+      });
+    });
+  </script>
+
+  <style>
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  </style>
+
+</body>
+</html>

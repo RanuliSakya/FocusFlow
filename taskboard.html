@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusFlow — Task board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/webfont/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="css/tokens.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .ff-main { overflow: hidden; }
+    #taskboard-root { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+  </style>
+</head>
+<body>
+
+  <div class="ff-app-shell">
+    <aside class="ff-sidebar" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="ff-sidebar-logo">FocusFlow</a>
+      <nav class="ff-sidebar-nav">
+        <a href="dashboard.html"  class="ff-nav-item" data-nav="dashboard"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</a>
+        <a href="taskboard.html"  class="ff-nav-item active" data-nav="taskboard"><i class="ti ti-layout-kanban" aria-hidden="true"></i>Task board</a>
+        <a href="focusmode.html"  class="ff-nav-item" data-nav="focusmode"><i class="ti ti-player-play" aria-hidden="true"></i>Focus mode</a>
+        <a href="settings.html"   class="ff-nav-item" data-nav="settings"><i class="ti ti-settings" aria-hidden="true"></i>Settings</a>
+      </nav>
+      <div class="ff-sidebar-footer">
+        <div class="ff-avatar js-user-initials" aria-hidden="true">RS</div>
+        <div class="ff-user-info">
+          <div class="ff-user-name js-user-name">Ranuli S.</div>
+          <button class="ff-user-signout js-signout">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="ff-main">
+      <header class="ff-topbar">
+        <div>
+          <div class="ff-topbar-title">Task board</div>
+          <div class="ff-topbar-sub">All tasks organised by focus context</div>
+        </div>
+        <button class="ff-btn ff-btn-primary" id="addTaskBtn">
+          <i class="ti ti-plus" aria-hidden="true"></i>Add task
+        </button>
+      </header>
+
+      <div id="taskboard-root" class="ff-fade-in"></div>
+
+      <footer class="ff-footer">
+        <div class="ff-footer-inner">
+          <div class="ff-footer-brand">
+            <span class="ff-footer-logo">FocusFlow</span>
+            <span class="ff-footer-copy">© 2026 FocusFlow. All rights reserved.</span>
+          </div>
+          <div class="ff-footer-links">
+            <a href="#" class="ff-footer-link">Privacy policy</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Terms of use</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Help</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <nav class="ff-bottom-nav" aria-label="Mobile navigation">
+    <div class="ff-bottom-nav-items">
+      <a href="dashboard.html"  class="ff-bottom-nav-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</a>
+      <a href="taskboard.html"  class="ff-bottom-nav-item active"><i class="ti ti-layout-kanban" aria-hidden="true"></i>Tasks</a>
+      <a href="focusmode.html"  class="ff-bottom-nav-item"><i class="ti ti-player-play" aria-hidden="true"></i>Focus</a>
+      <a href="settings.html"   class="ff-bottom-nav-item"><i class="ti ti-settings" aria-hidden="true"></i>Settings</a>
+    </div>
+  </nav>
+
+  <div id="task-modal-root"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/tasks.js"></script>
+
+  <script type="text/babel">
+
+    /* ── TaskBoard component ─────────────────────────────── */
+    const TaskBoard = ({ onTaskEdit, onTaskDelete, onTaskFocus, onTaskView, refreshKey }) => {
+      const [activeFilter, setActiveFilter] = React.useState('All');
+      const [tasks, setTasks] = React.useState([]);
+      const focusTypes = ['Deep Work', 'Quick Win', 'Collaborative', 'Admin'];
+      const colConfig = {
+        'Deep Work':     { bg:'#EEEDFE', dot:'#7F77DD', fg:'#3C3489' },
+        'Quick Win':     { bg:'#E1F5EE', dot:'#1D9E75', fg:'#085041' },
+        'Collaborative': { bg:'#FAEEDA', dot:'#EF9F27', fg:'#633806' },
+        'Admin':         { bg:'#FAECE7', dot:'#D85A30', fg:'#712B13' },
+      };
+      const badgeColors = {
+        'Deep Work':     { bg:'#EEEDFE', fg:'#3C3489' },
+        'Quick Win':     { bg:'#E1F5EE', fg:'#085041' },
+        'Collaborative': { bg:'#FAEEDA', fg:'#633806' },
+        'Admin':         { bg:'#FAECE7', fg:'#712B13' },
+      };
+      const energyColors = {
+        'High':   { bg:'#FCE8E8', fg:'#8B1515' },
+        'Medium': { bg:'#FFF5E0', fg:'#7A4F00' },
+        'Low':    { bg:'#EEF0F8', fg:'#3A4080' },
+      };
+      React.useEffect(() => { setTasks(FFTasks.getAll()); }, [refreshKey]);
+      const filteredTypes = activeFilter === 'All' ? focusTypes : [activeFilter];
+      const getTasksForType = (type) => tasks.filter(t => t.focusType === type && !t.completed);
+      const pillStyle = (type) => {
+        const isActive = activeFilter === type || (type === 'All' && activeFilter === 'All');
+        if (type === 'All') return { padding:'5px 16px', borderRadius:'20px', fontSize:'12px', fontWeight:'500', cursor:'pointer', border:'none', fontFamily:'Inter,sans-serif', background: isActive ? '#7F77DD' : '#F7F6F3', color: isActive ? '#FFFFFF' : '#888780', transition:'all 0.15s ease' };
+        const cfg = colConfig[type];
+        return { padding:'5px 16px', borderRadius:'20px', fontSize:'12px', fontWeight:'500', cursor:'pointer', border:`1px solid ${isActive ? cfg.dot : '#E0DFDA'}`, fontFamily:'Inter,sans-serif', background: isActive ? cfg.bg : '#FFFFFF', color: isActive ? cfg.fg : '#888780', transition:'all 0.15s ease' };
+      };
+      const handleDelete = (e, taskId) => {
+        e.stopPropagation();
+        if (window.confirm('Delete this task? This cannot be undone.')) { FFTasks.remove(taskId); setTasks(FFTasks.getAll()); if (onTaskDelete) onTaskDelete(taskId); }
+      };
+      return (
+        <div>
+          <div style={{ background:'#FFFFFF', borderBottom:'1px solid #E0DFDA', padding:'10px 24px', display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap' }}>
+            <span style={{ fontSize:'12px', fontWeight:'500', color:'#888780', marginRight:'4px' }}>Filter:</span>
+            {['All', ...focusTypes].map(type => (
+              <button key={type} style={pillStyle(type)} onClick={() => setActiveFilter(type)} aria-pressed={activeFilter === type}>{type}</button>
+            ))}
+            <span style={{ marginLeft:'auto', fontSize:'12px', color:'#888780' }}>
+              {tasks.filter(t => !t.completed).length} task{tasks.filter(t => !t.completed).length !== 1 ? 's' : ''} remaining
+            </span>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:`repeat(${filteredTypes.length},1fr)`, gap:'16px', padding:'20px 24px' }}>
+            {filteredTypes.map(type => {
+              const cfg = colConfig[type];
+              const typeTasks = getTasksForType(type);
+              return (
+                <div key={type}>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 12px', background:cfg.bg, borderRadius:'8px', marginBottom:'12px' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+                      <div style={{ width:10, height:10, borderRadius:'50%', background:cfg.dot, flexShrink:0 }}></div>
+                      <span style={{ fontSize:'13px', fontWeight:'600', color:'#1A1A1A' }}>{type}</span>
+                    </div>
+                    <span style={{ fontSize:'11px', color:'#888780', background:'rgba(255,255,255,0.7)', padding:'2px 8px', borderRadius:'10px' }}>{typeTasks.length}</span>
+                  </div>
+                  {typeTasks.length === 0 ? (
+                    <div style={{ textAlign:'center', padding:'24px 16px', color:'#888780', fontSize:'12px', border:'1px dashed #E0DFDA', borderRadius:'10px' }}>
+                      <i className="ti ti-plus" style={{ fontSize:'24px', display:'block', marginBottom:'6px', color:'#E0DFDA' }} aria-hidden="true"></i>No tasks here
+                    </div>
+                  ) : typeTasks.map(task => {
+                    const bc = badgeColors[task.focusType] || { bg:'#F7F6F3', fg:'#888780' };
+                    const ec = energyColors[task.energyLevel] || { bg:'#F7F6F3', fg:'#888780' };
+                    const due = FFUtils.formatDueDate(task.dueDate);
+                    const dueColor = task.dueDate ? (new Date(task.dueDate) < new Date() ? '#E84040' : '#888780') : '#888780';
+                    return (
+                      <div key={task.id}
+                        style={{ background:'#FFFFFF', border:'1px solid #E0DFDA', borderRadius:'10px', padding:'14px', marginBottom:'10px', display:'flex', flexDirection:'column', gap:'8px', cursor:'pointer', transition:'box-shadow 0.15s ease, border-color 0.15s ease' }}
+                        onClick={() => onTaskView && onTaskView(task.id)}
+                        onMouseEnter={e => { e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor='#888780'; }}
+                        onMouseLeave={e => { e.currentTarget.style.boxShadow='none'; e.currentTarget.style.borderColor='#E0DFDA'; }}
+                        role="button" tabIndex={0} aria-label={`View task: ${task.title}`}
+                        onKeyDown={e => e.key==='Enter' && onTaskView && onTaskView(task.id)}
+                      >
+                        <div style={{ fontSize:'13px', fontWeight:'500', color:'#1A1A1A', lineHeight:1.4 }}>{task.title}</div>
+                        <div style={{ display:'flex', gap:'6px', flexWrap:'wrap' }}>
+                          <span style={{ padding:'3px 8px', borderRadius:'20px', fontSize:'10px', fontWeight:'500', background:bc.bg, color:bc.fg }}>{task.focusType}</span>
+                          <span style={{ padding:'3px 8px', borderRadius:'20px', fontSize:'10px', fontWeight:'500', background:ec.bg, color:ec.fg }}>{task.energyLevel} energy</span>
+                        </div>
+                        <div style={{ fontSize:'11px', color:dueColor }}>📅 {due}</div>
+                        <div style={{ display:'flex', gap:'6px', paddingTop:'8px', borderTop:'1px solid #E0DFDA' }}>
+                          <button style={{ padding:'5px 10px', borderRadius:'6px', border:'none', background:'#7F77DD', color:'#fff', fontSize:'11px', fontWeight:'500', cursor:'pointer', fontFamily:'Inter,sans-serif' }}
+                            onClick={e => { e.stopPropagation(); onTaskFocus && onTaskFocus(task.id); }} aria-label={`Start focus for ${task.title}`}>▶ Focus</button>
+                          <button style={{ padding:'5px 10px', borderRadius:'6px', border:'1px solid #E0DFDA', background:'#F7F6F3', color:'#888780', fontSize:'11px', fontWeight:'500', cursor:'pointer', fontFamily:'Inter,sans-serif' }}
+                            onClick={e => { e.stopPropagation(); onTaskEdit && onTaskEdit(task); }} aria-label={`Edit task: ${task.title}`}>Edit</button>
+                          <button style={{ padding:'5px 10px', borderRadius:'6px', border:'1px solid #E84040', background:'#FCE8E8', color:'#E84040', fontSize:'11px', fontWeight:'500', cursor:'pointer', fontFamily:'Inter,sans-serif', marginLeft:'auto' }}
+                            onClick={e => handleDelete(e, task.id)} aria-label={`Delete task: ${task.title}`}><i className="ti ti-trash" aria-hidden="true"></i></button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    };
+
+    /* ── TaskModal component ─────────────────────────────── */
+    const TaskModal = ({ editTask, onSave, onClose }) => {
+      const isEdit = !!editTask;
+      const [form, setForm] = React.useState({ title: editTask?.title||'', description: editTask?.description||'', focusType: editTask?.focusType||'Quick Win', energyLevel: editTask?.energyLevel||'Medium', dueDate: editTask?.dueDate||'' });
+      const [errors, setErrors] = React.useState({});
+      const focusTypes = ['Deep Work','Quick Win','Collaborative','Admin'];
+      const energyLevels = ['High','Medium','Low'];
+      const handleChange = (field, value) => { setForm(prev => ({...prev,[field]:value})); if (errors[field]) setErrors(prev => ({...prev,[field]:''})); };
+      const validate = () => { const e={}; if (!form.title.trim()) e.title='Task title is required.'; return e; };
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const errs = validate();
+        if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+        const taskData = { title:form.title.trim(), description:form.description.trim(), focusType:form.focusType, energyLevel:form.energyLevel, dueDate:form.dueDate||null };
+        if (isEdit) { FFTasks.update(editTask.id, taskData); } else { FFTasks.add(taskData); }
+        if (onSave) onSave();
+      };
+      const iStyle = (f) => ({ width:'100%', padding:'10px 14px', border:`1px solid ${errors[f]?'#E84040':'#1A1A1A'}`, borderRadius:'8px', fontSize:'13px', fontFamily:'Inter,sans-serif', color:'#1A1A1A', background:errors[f]?'#FCE8E8':'#FFFFFF', outline:'none', boxSizing:'border-box' });
+      const lStyle = { display:'block', fontSize:'12px', fontWeight:'500', color:'#1A1A1A', marginBottom:'6px' };
+      const focusBadgeColors = { 'Deep Work':{bg:'#EEEDFE',fg:'#3C3489'}, 'Quick Win':{bg:'#E1F5EE',fg:'#085041'}, 'Collaborative':{bg:'#FAEEDA',fg:'#633806'}, 'Admin':{bg:'#FAECE7',fg:'#712B13'} };
+      const energyColors = { 'High':{bg:'#FCE8E8',fg:'#8B1515'}, 'Medium':{bg:'#FFF5E0',fg:'#7A4F00'}, 'Low':{bg:'#EEF0F8',fg:'#3A4080'} };
+      return (
+        <div className="modal fade" id="taskModal" tabIndex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content" style={{ borderRadius:'16px', border:'1px solid #E0DFDA', overflow:'hidden' }}>
+              <div className="modal-header" style={{ borderBottom:'1px solid #E0DFDA', padding:'20px 24px' }}>
+                <h2 id="taskModalLabel" style={{ fontSize:'16px', fontWeight:'700', color:'#1A1A1A', margin:0 }}>{isEdit ? 'Edit task' : 'Add new task'}</h2>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={onClose}></button>
+              </div>
+              <div className="modal-body" style={{ padding:'24px' }}>
+                <form id="taskForm" onSubmit={handleSubmit} noValidate>
+                  <div style={{ marginBottom:'16px' }}>
+                    <label style={lStyle} htmlFor="taskTitle">Task title <span style={{color:'#E84040'}}>*</span></label>
+                    <input style={iStyle('title')} type="text" id="taskTitle" placeholder="What needs to be done?" value={form.title} onChange={e => handleChange('title',e.target.value)} maxLength={100} autoFocus/>
+                    {errors.title && <div style={{ fontSize:'11px', color:'#E84040', marginTop:'4px' }}>{errors.title}</div>}
+                  </div>
+                  <div style={{ marginBottom:'16px' }}>
+                    <label style={lStyle} htmlFor="taskDesc">Description</label>
+                    <textarea style={{...iStyle('description'), minHeight:'72px', resize:'vertical'}} id="taskDesc" placeholder="Add more context or notes..." value={form.description} onChange={e => handleChange('description',e.target.value)} maxLength={500}/>
+                  </div>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px', marginBottom:'16px' }}>
+                    <div>
+                      <label style={lStyle} htmlFor="taskFocusType">Focus type <span style={{color:'#E84040'}}>*</span></label>
+                      <select style={iStyle('focusType')} id="taskFocusType" value={form.focusType} onChange={e => handleChange('focusType',e.target.value)}>
+                        {focusTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                      {form.focusType && <span style={{ display:'inline-flex', marginTop:'6px', padding:'3px 10px', borderRadius:'20px', fontSize:'11px', fontWeight:'500', background:focusBadgeColors[form.focusType]?.bg, color:focusBadgeColors[form.focusType]?.fg }}>{form.focusType}</span>}
+                    </div>
+                    <div>
+                      <label style={lStyle} htmlFor="taskEnergy">Energy level <span style={{color:'#E84040'}}>*</span></label>
+                      <select style={iStyle('energyLevel')} id="taskEnergy" value={form.energyLevel} onChange={e => handleChange('energyLevel',e.target.value)}>
+                        {energyLevels.map(l => <option key={l} value={l}>{l}</option>)}
+                      </select>
+                      {form.energyLevel && <span style={{ display:'inline-flex', marginTop:'6px', padding:'3px 10px', borderRadius:'20px', fontSize:'11px', fontWeight:'500', background:energyColors[form.energyLevel]?.bg, color:energyColors[form.energyLevel]?.fg }}>{form.energyLevel} energy</span>}
+                    </div>
+                  </div>
+                  <div style={{ marginBottom:'8px' }}>
+                    <label style={lStyle} htmlFor="taskDueDate">Due date <span style={{color:'#888780',fontWeight:'400'}}>(optional)</span></label>
+                    <input style={iStyle('dueDate')} type="date" id="taskDueDate" value={form.dueDate} onChange={e => handleChange('dueDate',e.target.value)} min={new Date().toISOString().split('T')[0]}/>
+                  </div>
+                </form>
+              </div>
+              <div className="modal-footer" style={{ borderTop:'1px solid #E0DFDA', padding:'16px 24px', gap:'10px' }}>
+                <button type="button" data-bs-dismiss="modal" onClick={onClose} style={{ padding:'9px 20px', borderRadius:'8px', border:'1px solid #E0DFDA', background:'#F7F6F3', fontSize:'13px', fontWeight:'500', color:'#888780', cursor:'pointer', fontFamily:'Inter,sans-serif' }}>Cancel</button>
+                <button type="submit" form="taskForm" style={{ padding:'9px 24px', borderRadius:'8px', border:'none', background:'#7F77DD', fontSize:'13px', fontWeight:'500', color:'#FFFFFF', cursor:'pointer', fontFamily:'Inter,sans-serif' }}>{isEdit ? 'Save changes' : 'Add task'}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    /* ── Page logic ──────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!FF.requireAuth()) return;
+      FFUtils.populateSidebar('taskboard');
+
+      let refreshKey  = 0;
+      let editingTask = null;
+
+      const boardRoot = ReactDOM.createRoot(document.getElementById('taskboard-root'));
+      const modalRoot = ReactDOM.createRoot(document.getElementById('task-modal-root'));
+
+      function renderBoard() {
+        refreshKey++;
+        boardRoot.render(
+          React.createElement(TaskBoard, {
+            refreshKey,
+            onTaskView:   (id) => FFUtils.goToTask(id),
+            onTaskFocus:  (id) => FFUtils.goToFocus(id),
+            onTaskEdit:   (task) => {
+              editingTask = task;
+              renderModal();
+              const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+              modal.show();
+            },
+            onTaskDelete: () => { FFUtils.toast('Task deleted', 'default'); renderBoard(); },
+          })
+        );
+      }
+
+      function renderModal() {
+        modalRoot.render(
+          React.createElement(TaskModal, {
+            editTask: editingTask,
+            onSave: () => {
+              const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
+              if (modal) modal.hide();
+              FFUtils.toast(editingTask ? 'Task updated' : 'Task added', 'success');
+              editingTask = null;
+              renderBoard();
+              setTimeout(renderModal, 300);
+            },
+            onClose: () => { editingTask = null; setTimeout(renderModal, 300); },
+          })
+        );
+      }
+
+      document.getElementById('addTaskBtn').addEventListener('click', () => {
+        editingTask = null;
+        renderModal();
+        const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+        modal.show();
+      });
+
+      renderBoard();
+      renderModal();
+    });
+
+  </script>
+
+</body>
+</html>

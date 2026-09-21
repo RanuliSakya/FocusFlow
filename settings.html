@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusFlow — Settings</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/webfont/tabler-icons.min.css"/>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+
+  <!-- FocusFlow Styles -->
+  <link rel="stylesheet" href="css/tokens.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .settings-section {
+      background: var(--color-white);
+      border: 1px solid var(--color-neutral-200);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+    .settings-header {
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-neutral-200);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .settings-header-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .settings-header-title {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+    }
+    .settings-header-sub {
+      font-size: var(--font-size-xs);
+      color: var(--color-neutral-500);
+      margin-top: 1px;
+    }
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-neutral-200);
+      gap: var(--space-4);
+    }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row-label {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-neutral-900);
+      margin-bottom: 2px;
+    }
+    .settings-row-hint {
+      font-size: var(--font-size-xs);
+      color: var(--color-neutral-500);
+    }
+    .settings-row-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-shrink: 0;
+    }
+    .settings-input {
+      padding: 8px 12px;
+      border: 1px solid var(--color-neutral-900);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-family);
+      color: var(--color-neutral-900);
+      background: var(--color-white);
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      min-width: 220px;
+    }
+    .settings-input:focus {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-focus);
+    }
+    .settings-input:disabled {
+      background: var(--color-neutral-100);
+      color: var(--color-neutral-500);
+      cursor: not-allowed;
+      border-color: var(--color-neutral-200);
+    }
+    .context-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .context-cell {
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--color-neutral-200);
+      border-right: 1px solid var(--color-neutral-200);
+    }
+    .context-cell:nth-child(even)       { border-right: none; }
+    .context-cell:nth-last-child(-n+2)  { border-bottom: none; }
+    .context-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-neutral-500);
+      margin-bottom: var(--space-2);
+    }
+    .context-preview {
+      display: inline-flex;
+      margin-top: var(--space-2);
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+    }
+    .danger-zone {
+      background: var(--color-white);
+      border: 1px solid var(--color-error);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .danger-zone-header {
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid #FCE8E8;
+      background: #FEF5F5;
+    }
+    .danger-zone-title {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-error);
+    }
+    .danger-zone-sub {
+      font-size: var(--font-size-xs);
+      color: var(--color-neutral-500);
+      margin-top: 2px;
+    }
+    @media (max-width: 640px) {
+      .settings-row { flex-direction: column; align-items: flex-start; }
+      .settings-row-right { width: 100%; }
+      .settings-input { width: 100%; min-width: unset; }
+      .context-grid { grid-template-columns: 1fr; }
+      .context-cell { border-right: none !important; }
+      .context-cell:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ff-app-shell">
+
+    <!-- Sidebar -->
+    <aside class="ff-sidebar" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="ff-sidebar-logo">FocusFlow</a>
+      <nav class="ff-sidebar-nav">
+        <a href="dashboard.html" class="ff-nav-item" data-nav="dashboard">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard
+        </a>
+        <a href="taskboard.html" class="ff-nav-item" data-nav="taskboard">
+          <i class="ti ti-layout-kanban" aria-hidden="true"></i>Task board
+        </a>
+        <a href="focusmode.html" class="ff-nav-item" data-nav="focusmode">
+          <i class="ti ti-player-play" aria-hidden="true"></i>Focus mode
+        </a>
+        <a href="settings.html" class="ff-nav-item active" data-nav="settings">
+          <i class="ti ti-settings" aria-hidden="true"></i>Settings
+        </a>
+      </nav>
+      <div class="ff-sidebar-footer">
+        <div class="ff-avatar js-user-initials" aria-hidden="true">RS</div>
+        <div class="ff-user-info">
+          <div class="ff-user-name js-user-name">Ranuli S.</div>
+          <button class="ff-user-signout js-signout">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="ff-main">
+
+      <!-- Topbar -->
+      <header class="ff-topbar">
+        <div>
+          <div class="ff-topbar-title">Settings</div>
+          <div class="ff-topbar-sub">Manage your preferences and account</div>
+        </div>
+      </header>
+
+      <!-- Page content -->
+      <div class="ff-page-content ff-fade-in">
+        <div class="d-flex flex-column gap-4" style="max-width:760px">
+
+          <!-- ── Profile ──────────────────────────────── -->
+          <div class="settings-section">
+            <div class="settings-header">
+              <div class="settings-header-icon" style="background:var(--color-primary-light)">
+                <i class="ti ti-user" style="color:var(--color-primary)" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="settings-header-title">Profile</div>
+                <div class="settings-header-sub">Your account information</div>
+              </div>
+            </div>
+
+            <!-- Display name -->
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Display name</div>
+                <div class="settings-row-hint">How you appear across FocusFlow</div>
+              </div>
+              <div class="settings-row-right">
+                <input
+                  class="settings-input"
+                  type="text"
+                  id="displayName"
+                  placeholder="Your name"
+                  maxlength="50"
+                />
+                <button class="ff-btn ff-btn-secondary ff-btn-sm" id="saveNameBtn">
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Email address</div>
+                <div class="settings-row-hint">Used to sign in to FocusFlow</div>
+              </div>
+              <div class="settings-row-right">
+                <input
+                  class="settings-input"
+                  type="email"
+                  id="emailDisplay"
+                  disabled
+                />
+                <span
+                  class="ff-badge ff-badge-neutral"
+                  style="white-space:nowrap"
+                >
+                  <i class="ti ti-lock" style="font-size:11px" aria-hidden="true"></i> Verified
+                </span>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Password</div>
+                <div class="settings-row-hint">Change your account password</div>
+              </div>
+              <div class="settings-row-right">
+                <input
+                  class="settings-input"
+                  type="password"
+                  id="newPassword"
+                  placeholder="New password (min. 8 characters)"
+                />
+                <button class="ff-btn ff-btn-secondary ff-btn-sm" id="savePasswordBtn">
+                  Update
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── Energy preferences ────────────────────── -->
+          <div class="settings-section">
+            <div class="settings-header">
+              <div class="settings-header-icon" style="background:var(--color-med-bg)">
+                <i class="ti ti-bolt" style="color:var(--color-collab)" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="settings-header-title">Energy preferences</div>
+                <div class="settings-header-sub">Control how energy levels work for you</div>
+              </div>
+            </div>
+
+            <!-- Default energy -->
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Default energy level</div>
+                <div class="settings-row-hint">Used when you skip the daily check-in</div>
+              </div>
+              <div class="settings-row-right">
+                <select class="settings-input" id="defaultEnergy" style="min-width:140px">
+                  <option value="High">⚡ High</option>
+                  <option value="Medium">🔆 Medium</option>
+                  <option value="Low">🌙 Low</option>
+                </select>
+                <button class="ff-btn ff-btn-secondary ff-btn-sm" id="saveEnergyBtn">
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <!-- Reset energy daily -->
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Reset energy on new day</div>
+                <div class="settings-row-hint">Prompt the energy check-in each morning automatically</div>
+              </div>
+              <div class="settings-row-right">
+                <label class="ff-toggle" aria-label="Toggle reset energy on new day">
+                  <input type="checkbox" id="resetEnergyToggle"/>
+                  <span class="ff-toggle-slider"></span>
+                </label>
+                <span class="ff-toggle-label" id="resetEnergyLabel">On</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── Focus context labels ───────────────────── -->
+          <div class="settings-section">
+            <div class="settings-header">
+              <div class="settings-header-icon" style="background:var(--color-quick-win-bg)">
+                <i class="ti ti-tag" style="color:var(--color-quick-win)" aria-hidden="true"></i>
+              </div>
+              <div>
+                <div class="settings-header-title">Focus context labels</div>
+                <div class="settings-header-sub">Customise the names shown on each focus context</div>
+              </div>
+            </div>
+            <div class="context-grid">
+              <div class="context-cell">
+                <div class="context-label">Context 1</div>
+                <input class="settings-input" style="width:100%;min-width:unset" type="text" id="ctx1" maxlength="30"/>
+                <div>
+                  <span class="context-preview" style="background:var(--color-deep-work-bg);color:var(--color-deep-work-fg)" id="ctx1Preview"></span>
+                </div>
+              </div>
+              <div class="context-cell">
+                <div class="context-label">Context 2</div>
+                <input class="settings-input" style="width:100%;min-width:unset" type="text" id="ctx2" maxlength="30"/>
+                <div>
+                  <span class="context-preview" style="background:var(--color-quick-win-bg);color:var(--color-quick-win-fg)" id="ctx2Preview"></span>
+                </div>
+              </div>
+              <div class="context-cell">
+                <div class="context-label">Context 3</div>
+                <input class="settings-input" style="width:100%;min-width:unset" type="text" id="ctx3" maxlength="30"/>
+                <div>
+                  <span class="context-preview" style="background:var(--color-collab-bg);color:var(--color-collab-fg)" id="ctx3Preview"></span>
+                </div>
+              </div>
+              <div class="context-cell">
+                <div class="context-label">Context 4</div>
+                <input class="settings-input" style="width:100%;min-width:unset" type="text" id="ctx4" maxlength="30"/>
+                <div>
+                  <span class="context-preview" style="background:var(--color-admin-bg);color:var(--color-admin-fg)" id="ctx4Preview"></span>
+                </div>
+              </div>
+            </div>
+            <div class="settings-row" style="border-top:1px solid var(--color-neutral-200)">
+              <span style="font-size:13px;color:var(--color-neutral-500)">Changes apply across all views</span>
+              <button class="ff-btn ff-btn-secondary ff-btn-sm" id="saveContextBtn">
+                Save labels
+              </button>
+            </div>
+          </div>
+
+          <!-- ── Danger zone ────────────────────────────── -->
+          <div class="danger-zone">
+            <div class="danger-zone-header">
+              <div class="danger-zone-title">
+                <i class="ti ti-alert-triangle" aria-hidden="true"></i> Danger zone
+              </div>
+              <div class="danger-zone-sub">These actions are permanent and cannot be undone</div>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Clear all tasks</div>
+                <div class="settings-row-hint">Permanently delete all your tasks from this device</div>
+              </div>
+              <button class="ff-btn ff-btn-danger ff-btn-sm" id="clearTasksBtn">
+                <i class="ti ti-trash" aria-hidden="true"></i> Clear all tasks
+              </button>
+            </div>
+            <div class="settings-row">
+              <div>
+                <div class="settings-row-label">Sign out</div>
+                <div class="settings-row-hint">Sign out of FocusFlow on this device</div>
+              </div>
+              <button class="ff-btn ff-btn-danger ff-btn-sm js-signout">
+                <i class="ti ti-logout" aria-hidden="true"></i> Sign out
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="ff-footer">
+        <div class="ff-footer-inner">
+          <div class="ff-footer-brand">
+            <span class="ff-footer-logo">FocusFlow</span>
+            <span class="ff-footer-copy">© 2026 FocusFlow. All rights reserved.</span>
+          </div>
+          <div class="ff-footer-links">
+            <a href="#" class="ff-footer-link">Privacy policy</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Terms of use</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Help</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Contact</a>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="ff-bottom-nav" aria-label="Mobile navigation">
+    <div class="ff-bottom-nav-items">
+      <a href="dashboard.html"  class="ff-bottom-nav-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</a>
+      <a href="taskboard.html"  class="ff-bottom-nav-item"><i class="ti ti-layout-kanban" aria-hidden="true"></i>Tasks</a>
+      <a href="focusmode.html"  class="ff-bottom-nav-item"><i class="ti ti-player-play" aria-hidden="true"></i>Focus</a>
+      <a href="settings.html"   class="ff-bottom-nav-item active"><i class="ti ti-settings" aria-hidden="true"></i>Settings</a>
+    </div>
+  </nav>
+
+  <!-- ── Scripts ───────────────────────────────────────────── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/tasks.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      if (!FF.requireAuth()) return;
+      FFUtils.populateSidebar('settings');
+
+      const user     = FF.getCurrentUser();
+      const settings = FF.getSettings();
+
+      // ── Populate fields ────────────────────────────────
+      document.getElementById('displayName').value    = user.name;
+      document.getElementById('emailDisplay').value   = user.email;
+      document.getElementById('defaultEnergy').value  = settings.defaultEnergy;
+      document.getElementById('resetEnergyToggle').checked = settings.resetEnergyDaily;
+      document.getElementById('resetEnergyLabel').textContent = settings.resetEnergyDaily ? 'On' : 'Off';
+
+      const labels = settings.contextLabels;
+      document.getElementById('ctx1').value = labels.deepWork;
+      document.getElementById('ctx2').value = labels.quickWin;
+      document.getElementById('ctx3').value = labels.collaborative;
+      document.getElementById('ctx4').value = labels.admin;
+      updatePreviews();
+
+      // ── Context label previews ─────────────────────────
+      function updatePreviews() {
+        document.getElementById('ctx1Preview').textContent = document.getElementById('ctx1').value || 'Deep Work';
+        document.getElementById('ctx2Preview').textContent = document.getElementById('ctx2').value || 'Quick Win';
+        document.getElementById('ctx3Preview').textContent = document.getElementById('ctx3').value || 'Collaborative';
+        document.getElementById('ctx4Preview').textContent = document.getElementById('ctx4').value || 'Admin';
+      }
+      ['ctx1','ctx2','ctx3','ctx4'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updatePreviews);
+      });
+
+      // ── Toggle label update ────────────────────────────
+      document.getElementById('resetEnergyToggle').addEventListener('change', function() {
+        document.getElementById('resetEnergyLabel').textContent = this.checked ? 'On' : 'Off';
+      });
+
+      // ── Save display name ──────────────────────────────
+      document.getElementById('saveNameBtn').addEventListener('click', () => {
+        const name = document.getElementById('displayName').value.trim();
+        if (!name || name.length < 2) {
+          FFUtils.toast('Please enter a valid name', 'error');
+          return;
+        }
+        const users = FF.getUsers();
+        const idx   = users.findIndex(u => u.id === user.id);
+        if (idx !== -1) {
+          users[idx].name = name;
+          localStorage.setItem('ff_users', JSON.stringify(users));
+          FF.setCurrentUser({ ...FF.getCurrentUser(), name });
+          FFUtils.populateSidebar('settings');
+          FFUtils.toast('Name updated', 'success');
+        }
+      });
+
+      // ── Save password ──────────────────────────────────
+      document.getElementById('savePasswordBtn').addEventListener('click', () => {
+        const newPwd = document.getElementById('newPassword').value;
+        if (!newPwd || newPwd.length < 8) {
+          FFUtils.toast('Password must be at least 8 characters', 'error');
+          return;
+        }
+        const users = FF.getUsers();
+        const idx   = users.findIndex(u => u.id === user.id);
+        if (idx !== -1) {
+          users[idx].password = newPwd;
+          localStorage.setItem('ff_users', JSON.stringify(users));
+          document.getElementById('newPassword').value = '';
+          FFUtils.toast('Password updated', 'success');
+        }
+      });
+
+      // ── Save energy preferences ────────────────────────
+      document.getElementById('saveEnergyBtn').addEventListener('click', () => {
+        const updated = {
+          ...FF.getSettings(),
+          defaultEnergy:    document.getElementById('defaultEnergy').value,
+          resetEnergyDaily: document.getElementById('resetEnergyToggle').checked,
+        };
+        FF.saveSettings(updated);
+        FFUtils.toast('Energy preferences saved', 'success');
+      });
+
+      // ── Save context labels ────────────────────────────
+      document.getElementById('saveContextBtn').addEventListener('click', () => {
+        const updated = {
+          ...FF.getSettings(),
+          contextLabels: {
+            deepWork:      document.getElementById('ctx1').value.trim() || 'Deep Work',
+            quickWin:      document.getElementById('ctx2').value.trim() || 'Quick Win',
+            collaborative: document.getElementById('ctx3').value.trim() || 'Collaborative',
+            admin:         document.getElementById('ctx4').value.trim() || 'Admin',
+          }
+        };
+        FF.saveSettings(updated);
+        updatePreviews();
+        FFUtils.toast('Context labels saved', 'success');
+      });
+
+      // ── Clear all tasks ────────────────────────────────
+      document.getElementById('clearTasksBtn').addEventListener('click', () => {
+        if (window.confirm('This will permanently delete all your tasks. Are you sure?')) {
+          const key = `ff_tasks_${user.id}`;
+          localStorage.removeItem(key);
+          FFUtils.toast('All tasks cleared', 'default');
+        }
+      });
+
+    });
+  </script>
+
+</body>
+</html>

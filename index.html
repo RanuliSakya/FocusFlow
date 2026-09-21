@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusFlow — Work smarter, not harder</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/webfont/tabler-icons.min.css"/>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+
+  <!-- FocusFlow Styles -->
+  <link rel="stylesheet" href="css/tokens.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ── Hero ─────────────────────────────────────────────── */
+    .hero-section {
+      padding: 80px 0 64px;
+      text-align: center;
+      background: var(--color-white);
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--color-primary-light);
+      color: var(--color-primary-fg);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      margin-bottom: 24px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .hero-h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-900);
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+    .hero-h1 span { color: var(--color-primary); }
+    .hero-sub {
+      font-size: 1.0625rem;
+      color: var(--color-neutral-500);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.65;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Features ─────────────────────────────────────────── */
+    .features-section {
+      padding: 72px 0;
+      background: var(--color-neutral-50);
+    }
+    .section-eyebrow {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-neutral-900);
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      font-size: var(--font-size-base);
+      color: var(--color-neutral-500);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .feat-icon-wrap {
+      width: 48px; height: 48px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
+
+    /* ── How it works ─────────────────────────────────────── */
+    .how-section {
+      padding: 72px 0;
+      background: var(--color-white);
+    }
+    .step-number {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--color-primary-light);
+      color: var(--color-primary-fg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ── CTA banner ───────────────────────────────────────── */
+    .cta-section {
+      padding: 72px 0;
+      background: var(--color-primary);
+      text-align: center;
+    }
+    .cta-section h2 { color: var(--color-white); }
+    .cta-section p  { color: rgba(255,255,255,0.8); }
+
+    /* ── Responsive nav ───────────────────────────────────── */
+    @media (max-width: 640px) {
+      .ff-public-nav-links .ff-nav-link { display: none; }
+      .hero-section { padding: 56px 0 48px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ───────────────────────────────────────────── -->
+  <nav class="ff-public-nav">
+    <a href="index.html" class="ff-public-logo">FocusFlow</a>
+    <div class="ff-public-nav-links">
+      <a href="#features" class="ff-nav-link">Features</a>
+      <a href="#how-it-works" class="ff-nav-link">How it works</a>
+      <a href="signin.html" class="ff-btn ff-btn-ghost" style="padding:8px 18px;font-size:13px">Sign in</a>
+      <a href="signup.html" class="ff-btn ff-btn-primary" style="padding:8px 18px;font-size:13px">Sign up free</a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ─────────────────────────────────────────────── -->
+  <section class="hero-section">
+    <div class="container" style="max-width:860px">
+      <div class="hero-eyebrow ff-fade-in">
+        <i class="ti ti-bolt" aria-hidden="true"></i>
+        Energy-aware task management
+      </div>
+      <h1 class="hero-h1 ff-slide-up">
+        Work smarter,<br><span>not harder.</span>
+      </h1>
+      <p class="hero-sub ff-slide-up">
+        FocusFlow adapts to your energy level and surfaces the right tasks at the right time — so you always know exactly what to work on next.
+      </p>
+      <div class="hero-ctas ff-slide-up">
+        <a href="signup.html" class="ff-btn ff-btn-primary" style="padding:12px 28px;font-size:15px">
+          <i class="ti ti-arrow-right" aria-hidden="true"></i>
+          Get started free
+        </a>
+        <a href="#how-it-works" class="ff-btn ff-btn-ghost" style="padding:12px 28px;font-size:15px">
+          See how it works
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Features ─────────────────────────────────────────── -->
+  <section class="features-section" id="features">
+    <div class="container" style="max-width:960px">
+      <div class="text-center mb-5">
+        <div class="section-eyebrow">Features</div>
+        <h2 class="section-title">Everything you need to do your best work</h2>
+        <p class="section-sub">Built around how people actually think and work — not how project managers want them to.</p>
+      </div>
+      <div class="row g-4">
+        <!-- Feature 1 -->
+        <div class="col-md-4">
+          <div class="ff-card ff-card-padded h-100 ff-slide-up">
+            <div class="feat-icon-wrap" style="background:var(--color-primary-light)">
+              <i class="ti ti-bolt" style="color:var(--color-primary)" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:16px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Energy-aware</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              Check in with your energy level each morning — high, medium, or low — and FocusFlow surfaces tasks that match how you feel right now.
+            </p>
+          </div>
+        </div>
+        <!-- Feature 2 -->
+        <div class="col-md-4">
+          <div class="ff-card ff-card-padded h-100 ff-slide-up" style="animation-delay:0.1s">
+            <div class="feat-icon-wrap" style="background:var(--color-quick-win-bg)">
+              <i class="ti ti-layout-kanban" style="color:var(--color-quick-win)" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:16px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Focus contexts</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              Organise tasks by Deep Work, Quick Win, Collaborative, or Admin — so you instantly know what each task demands from you cognitively.
+            </p>
+          </div>
+        </div>
+        <!-- Feature 3 -->
+        <div class="col-md-4">
+          <div class="ff-card ff-card-padded h-100 ff-slide-up" style="animation-delay:0.2s">
+            <div class="feat-icon-wrap" style="background:var(--color-collab-bg)">
+              <i class="ti ti-clock" style="color:var(--color-collab)" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:16px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Built-in timer</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              Enter distraction-free Focus Mode with a countdown timer for each task. Start, pause, and reset without leaving the page.
+            </p>
+          </div>
+        </div>
+        <!-- Feature 4 -->
+        <div class="col-md-4">
+          <div class="ff-card ff-card-padded h-100 ff-slide-up" style="animation-delay:0.05s">
+            <div class="feat-icon-wrap" style="background:var(--color-admin-bg)">
+              <i class="ti ti-checklist" style="color:var(--color-admin)" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:16px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Subtask tracking</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              Break tasks into subtasks and tick them off as you go — even during a focus session, so your progress is always visible.
+            </p>
+          </div>
+        </div>
+        <!-- Feature 5 -->
+        <div class="col-md-4">
+          <div class="ff-card ff-card-padded h-100 ff-slide-up" style="animation-delay:0.15s">
+            <div class="feat-icon-wrap" style="background:var(--color-low-bg)">
+              <i class="ti ti-device-mobile" style="color:var(--color-low-fg)" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:16px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Fully responsive</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              Works seamlessly across desktop, tablet, and mobile so you can check and update your tasks wherever you are.
+            </p>
+          </div>
+        </div>
+        <!-- Feature 6 -->
+        <div class="col-md-4">
+          <div class="ff-card ff-card-padded h-100 ff-slide-up" style="animation-delay:0.25s">
+            <div class="feat-icon-wrap" style="background:var(--color-neutral-100)">
+              <i class="ti ti-lock" style="color:var(--color-neutral-500)" aria-hidden="true"></i>
+            </div>
+            <h3 style="font-size:16px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Private by default</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              Your data stays in your browser. No servers, no syncing, no surveillance — just you and your tasks.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How it works ─────────────────────────────────────── -->
+  <section class="how-section" id="how-it-works">
+    <div class="container" style="max-width:860px">
+      <div class="text-center mb-5">
+        <div class="section-eyebrow">How it works</div>
+        <h2 class="section-title">Three simple steps to focused work</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="d-flex flex-column align-items-start ff-slide-up">
+            <div class="step-number">1</div>
+            <h3 style="font-size:15px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Check in with your energy</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              Each day, tell FocusFlow how you're feeling. High, medium, or low — it takes one tap.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex flex-column align-items-start ff-slide-up" style="animation-delay:0.1s">
+            <div class="step-number">2</div>
+            <h3 style="font-size:15px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Get your suggested tasks</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              FocusFlow surfaces the four tasks that best match your current energy and focus context — no decision fatigue.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="d-flex flex-column align-items-start ff-slide-up" style="animation-delay:0.2s">
+            <div class="step-number">3</div>
+            <h3 style="font-size:15px;font-weight:600;color:var(--color-neutral-900);margin-bottom:8px">Focus and finish</h3>
+            <p style="font-size:13px;color:var(--color-neutral-500);line-height:1.6;margin:0">
+              Start a focus session with one click. The built-in timer keeps you on track until the task is done.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA Banner ────────────────────────────────────────── -->
+  <section class="cta-section">
+    <div class="container" style="max-width:640px">
+      <h2 style="font-size:clamp(1.5rem,3vw,2rem);font-weight:700;margin-bottom:12px">
+        Ready to work with your energy, not against it?
+      </h2>
+      <p style="font-size:15px;margin-bottom:32px">
+        Create your free account in under 30 seconds. No credit card required.
+      </p>
+      <a href="signup.html" class="ff-btn ff-btn-ghost" style="padding:12px 32px;font-size:15px;background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.4)">
+        <i class="ti ti-arrow-right" aria-hidden="true"></i>
+        Get started free
+      </a>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────────── -->
+  <footer class="ff-footer">
+    <div class="ff-footer-inner" style="max-width:1200px;margin:0 auto">
+      <div class="ff-footer-brand">
+        <span class="ff-footer-logo">FocusFlow</span>
+        <span class="ff-footer-copy">© 2026 FocusFlow. All rights reserved.</span>
+      </div>
+      <div class="ff-footer-links">
+        <a href="#" class="ff-footer-link">Privacy policy</a>
+        <div class="ff-footer-divider"></div>
+        <a href="#" class="ff-footer-link">Terms of use</a>
+        <div class="ff-footer-divider"></div>
+        <a href="#" class="ff-footer-link">Help</a>
+        <div class="ff-footer-divider"></div>
+        <a href="#" class="ff-footer-link">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── Scripts ───────────────────────────────────────────── -->
+  <!-- Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+  <!-- React -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+  <!-- FocusFlow JS -->
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/tasks.js"></script>
+
+  <script>
+    // Redirect authenticated users straight to dashboard
+    document.addEventListener('DOMContentLoaded', () => {
+      FF.redirectIfAuthed();
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+          const target = document.querySelector(a.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>

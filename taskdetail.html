@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusFlow — Task detail</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/webfont/tabler-icons.min.css"/>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+
+  <!-- FocusFlow Styles -->
+  <link rel="stylesheet" href="css/tokens.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: var(--space-5);
+      align-items: start;
+    }
+    .subtask-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-neutral-200);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .subtask-row:last-child { border-bottom: none; }
+    .subtask-row:hover { background: var(--color-neutral-50); }
+    .subtask-checkbox {
+      width: 20px; height: 20px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--color-neutral-200);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all var(--transition-fast);
+    }
+    .subtask-checkbox.done {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    .subtask-text { font-size: var(--font-size-base); color: var(--color-neutral-900); line-height: 1.4; }
+    .subtask-text.done { color: var(--color-neutral-500); text-decoration: line-through; }
+    .detail-meta-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-neutral-200);
+    }
+    .detail-meta-row:last-child { border-bottom: none; }
+    .detail-meta-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-neutral-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .progress-text {
+      font-size: var(--font-size-xs);
+      color: var(--color-neutral-500);
+      margin-top: var(--space-2);
+    }
+    @media (max-width: 768px) {
+      .detail-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ff-app-shell">
+
+    <!-- Sidebar -->
+    <aside class="ff-sidebar" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="ff-sidebar-logo">FocusFlow</a>
+      <nav class="ff-sidebar-nav">
+        <a href="dashboard.html" class="ff-nav-item" data-nav="dashboard">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard
+        </a>
+        <a href="taskboard.html" class="ff-nav-item active" data-nav="taskboard">
+          <i class="ti ti-layout-kanban" aria-hidden="true"></i>Task board
+        </a>
+        <a href="focusmode.html" class="ff-nav-item" data-nav="focusmode">
+          <i class="ti ti-player-play" aria-hidden="true"></i>Focus mode
+        </a>
+        <a href="settings.html" class="ff-nav-item" data-nav="settings">
+          <i class="ti ti-settings" aria-hidden="true"></i>Settings
+        </a>
+      </nav>
+      <div class="ff-sidebar-footer">
+        <div class="ff-avatar js-user-initials" aria-hidden="true">RS</div>
+        <div class="ff-user-info">
+          <div class="ff-user-name js-user-name">Ranuli S.</div>
+          <button class="ff-user-signout js-signout">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="ff-main">
+
+      <!-- Topbar -->
+      <header class="ff-topbar">
+        <nav class="ff-breadcrumb" aria-label="Breadcrumb">
+          <a href="taskboard.html" class="ff-breadcrumb-link">
+            <i class="ti ti-arrow-left" aria-hidden="true"></i> Task board
+          </a>
+          <span class="ff-breadcrumb-sep">/</span>
+          <span class="ff-breadcrumb-current" id="breadcrumbTitle">Task detail</span>
+        </nav>
+        <button
+          class="ff-btn ff-btn-ghost ff-btn-sm"
+          id="editTaskBtn"
+          data-bs-toggle="modal"
+          data-bs-target="#taskModal"
+        >
+          <i class="ti ti-edit" aria-hidden="true"></i> Edit task
+        </button>
+      </header>
+
+      <!-- Page content -->
+      <div class="ff-page-content ff-fade-in">
+        <div class="detail-layout" id="detailLayout">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="ff-footer">
+        <div class="ff-footer-inner">
+          <div class="ff-footer-brand">
+            <span class="ff-footer-logo">FocusFlow</span>
+            <span class="ff-footer-copy">© 2026 FocusFlow. All rights reserved.</span>
+          </div>
+          <div class="ff-footer-links">
+            <a href="#" class="ff-footer-link">Privacy policy</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Terms of use</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Help</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Contact</a>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- Bottom nav (mobile) -->
+  <nav class="ff-bottom-nav" aria-label="Mobile navigation">
+    <div class="ff-bottom-nav-items">
+      <a href="dashboard.html"  class="ff-bottom-nav-item"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</a>
+      <a href="taskboard.html"  class="ff-bottom-nav-item active"><i class="ti ti-layout-kanban" aria-hidden="true"></i>Tasks</a>
+      <a href="focusmode.html"  class="ff-bottom-nav-item"><i class="ti ti-player-play" aria-hidden="true"></i>Focus</a>
+      <a href="settings.html"   class="ff-bottom-nav-item"><i class="ti ti-settings" aria-hidden="true"></i>Settings</a>
+    </div>
+  </nav>
+
+  <!-- Task modal container (React) -->
+  <div id="task-modal-root"></div>
+
+  <!-- ── Scripts ───────────────────────────────────────────── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/tasks.js"></script>
+  <script type="text/babel" src="js/components/TaskModal.js"></script>
+
+  <script type="text/babel">
+    document.addEventListener('DOMContentLoaded', () => {
+
+      if (!FF.requireAuth()) return;
+      FFUtils.populateSidebar('taskboard');
+
+      // ── Load task ──────────────────────────────────────
+      const taskId = FFUtils.getCurrentTaskId();
+      if (!taskId) { window.location.href = 'taskboard.html'; return; }
+
+      let task = FFTasks.getById(taskId);
+      if (!task) { window.location.href = 'taskboard.html'; return; }
+
+      // ── Render page ────────────────────────────────────
+      function render() {
+        task = FFTasks.getById(taskId);
+        if (!task) { window.location.href = 'taskboard.html'; return; }
+
+        document.title = `FocusFlow — ${task.title}`;
+        document.getElementById('breadcrumbTitle').textContent = task.title;
+
+        const typeClass   = FFUtils.focusTypeClass(task.focusType);
+        const energyClass = FFUtils.energyClass(task.energyLevel);
+        const due         = FFUtils.formatDueDate(task.dueDate);
+        const dueColor    = FFUtils.dueDateColor(task.dueDate);
+
+        const doneSubtasks  = (task.subtasks || []).filter(s => s.done).length;
+        const totalSubtasks = (task.subtasks || []).length;
+        const pct           = totalSubtasks > 0 ? Math.round((doneSubtasks / totalSubtasks) * 100) : 0;
+
+        document.getElementById('detailLayout').innerHTML = `
+
+          <!-- Left column -->
+          <div class="d-flex flex-column gap-4">
+
+            <!-- Main task card -->
+            <div class="ff-card ff-card-padded">
+              <h1 style="font-size:20px;font-weight:700;color:var(--color-neutral-900);margin-bottom:12px;line-height:1.3">
+                ${FFUtils.escapeHTML(task.title)}
+              </h1>
+              <div class="d-flex gap-2 flex-wrap mb-3">
+                <span class="ff-badge ${typeClass}">${task.focusType}</span>
+                <span class="ff-badge ${energyClass}">${task.energyLevel} energy</span>
+                <span class="ff-badge ff-badge-neutral" style="${dueColor}">📅 ${due}</span>
+              </div>
+              <hr class="ff-divider" style="margin:0 0 16px"/>
+              <div class="ff-section-label">Description</div>
+              ${task.description
+                ? `<p style="font-size:13px;color:var(--color-neutral-900);line-height:1.65;background:var(--color-neutral-100);border-radius:8px;padding:12px 14px;margin:0">${FFUtils.escapeHTML(task.description)}</p>`
+                : `<p style="font-size:13px;color:var(--color-neutral-500);font-style:italic;margin:0">No description added.</p>`
+              }
+            </div>
+
+            <!-- Subtasks card -->
+            <div class="ff-card ff-card-padded">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="ff-section-label mb-0">Subtasks</div>
+                <span style="font-size:12px;color:var(--color-neutral-500)">${doneSubtasks} of ${totalSubtasks} completed</span>
+              </div>
+
+              ${totalSubtasks > 0 ? `
+                <div class="ff-progress-wrap mb-3">
+                  <div class="ff-progress-track">
+                    <div class="ff-progress-fill" style="width:${pct}%"></div>
+                  </div>
+                  <div class="progress-text">${pct}% complete</div>
+                </div>` : ''}
+
+              <div id="subtaskList">
+                ${totalSubtasks === 0
+                  ? `<p style="font-size:13px;color:var(--color-neutral-500);font-style:italic;margin:0">No subtasks added yet.</p>`
+                  : (task.subtasks || []).map(s => `
+                    <div class="subtask-row" data-subtask-id="${s.id}" role="button" tabindex="0" aria-label="Toggle subtask: ${FFUtils.escapeHTML(s.text)}">
+                      <div class="subtask-checkbox ${s.done ? 'done' : ''}">
+                        ${s.done ? '<i class="ti ti-check" style="font-size:11px;color:#fff" aria-hidden="true"></i>' : ''}
+                      </div>
+                      <span class="subtask-text ${s.done ? 'done' : ''}">${FFUtils.escapeHTML(s.text)}</span>
+                    </div>`).join('')
+                }
+              </div>
+
+              <!-- Add subtask -->
+              <div class="d-flex gap-2 mt-3" id="addSubtaskRow">
+                <input
+                  class="ff-input"
+                  type="text"
+                  id="newSubtaskInput"
+                  placeholder="Add a subtask..."
+                  style="flex:1"
+                  maxlength="100"
+                />
+                <button class="ff-btn ff-btn-secondary ff-btn-sm" id="addSubtaskBtn">
+                  <i class="ti ti-plus" aria-hidden="true"></i> Add
+                </button>
+              </div>
+            </div>
+
+            <!-- Notes card -->
+            <div class="ff-card ff-card-padded">
+              <div class="ff-section-label">Notes</div>
+              <textarea
+                class="ff-textarea"
+                id="notesField"
+                placeholder="Add notes or context for this task..."
+                rows="4"
+              >${FFUtils.escapeHTML(task.notes || '')}</textarea>
+              <button class="ff-btn ff-btn-ghost ff-btn-sm mt-2" id="saveNotesBtn">
+                <i class="ti ti-device-floppy" aria-hidden="true"></i> Save notes
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Right column -->
+          <div class="d-flex flex-column gap-4">
+
+            <!-- Task details card -->
+            <div class="ff-card ff-card-padded">
+              <div class="ff-section-label">Task details</div>
+              <div class="detail-meta-row">
+                <div class="detail-meta-label">Focus type</div>
+                <span class="ff-badge ${typeClass}">${task.focusType}</span>
+              </div>
+              <div class="detail-meta-row">
+                <div class="detail-meta-label">Energy required</div>
+                <span class="ff-badge ${energyClass}">${task.energyLevel} energy</span>
+              </div>
+              <div class="detail-meta-row">
+                <div class="detail-meta-label">Due date</div>
+                <span style="font-size:13px;color:var(--color-neutral-900);${dueColor}">
+                  ${task.dueDate
+                    ? new Date(task.dueDate).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' })
+                    : 'No due date'}
+                </span>
+              </div>
+              <div class="detail-meta-row" style="border-bottom:none">
+                <div class="detail-meta-label">Status</div>
+                <span class="ff-badge ${task.completed ? 'ff-badge-quick-win' : 'ff-badge-neutral'}">
+                  ${task.completed ? 'Completed' : 'In progress'}
+                </span>
+              </div>
+            </div>
+
+            <!-- Actions card -->
+            <div class="ff-card ff-card-padded d-flex flex-column gap-3">
+              <div class="ff-section-label">Actions</div>
+              <button class="ff-btn ff-btn-primary ff-btn-full" id="startFocusBtn">
+                <i class="ti ti-player-play" aria-hidden="true"></i> Start focus mode
+              </button>
+              <button class="ff-btn ff-btn-success ff-btn-full ${task.completed ? 'd-none' : ''}" id="markCompleteBtn">
+                <i class="ti ti-circle-check" aria-hidden="true"></i> Mark as complete
+              </button>
+              <button class="ff-btn ff-btn-ghost ff-btn-full ${task.completed ? '' : 'd-none'}" id="markIncompleteBtn">
+                <i class="ti ti-circle-x" aria-hidden="true"></i> Mark as incomplete
+              </button>
+              <hr class="ff-divider" style="margin:0"/>
+              <button class="ff-btn ff-btn-danger ff-btn-full" id="deleteTaskBtn">
+                <i class="ti ti-trash" aria-hidden="true"></i> Delete task
+              </button>
+            </div>
+
+          </div>
+        `;
+
+        bindEvents();
+      }
+
+      // ── Bind event handlers ────────────────────────────
+      function bindEvents() {
+
+        // Subtask toggle
+        document.querySelectorAll('.subtask-row').forEach(row => {
+          const toggle = () => {
+            FFTasks.toggleSubtask(taskId, row.dataset.subtaskId);
+            render();
+            FFUtils.toast('Subtask updated', 'success');
+          };
+          row.addEventListener('click', toggle);
+          row.addEventListener('keydown', e => e.key === 'Enter' && toggle());
+        });
+
+        // Add subtask
+        const addBtn   = document.getElementById('addSubtaskBtn');
+        const addInput = document.getElementById('newSubtaskInput');
+        const doAdd = () => {
+          const text = addInput.value.trim();
+          if (!text) { addInput.classList.add('ff-input-error'); return; }
+          FFTasks.addSubtask(taskId, text);
+          render();
+          FFUtils.toast('Subtask added', 'success');
+        };
+        addBtn.addEventListener('click', doAdd);
+        addInput.addEventListener('keydown', e => { if (e.key === 'Enter') doAdd(); });
+        addInput.addEventListener('input',   () => addInput.classList.remove('ff-input-error'));
+
+        // Save notes
+        document.getElementById('saveNotesBtn').addEventListener('click', () => {
+          const notes = document.getElementById('notesField').value;
+          FFTasks.update(taskId, { notes });
+          FFUtils.toast('Notes saved', 'success');
+        });
+
+        // Start focus mode
+        document.getElementById('startFocusBtn').addEventListener('click', () => {
+          FFUtils.goToFocus(taskId);
+        });
+
+        // Mark complete / incomplete
+        const completeBtn   = document.getElementById('markCompleteBtn');
+        const incompleteBtn = document.getElementById('markIncompleteBtn');
+        if (completeBtn) {
+          completeBtn.addEventListener('click', () => {
+            FFTasks.markComplete(taskId);
+            FFUtils.toast('Task marked as complete', 'success');
+            render();
+          });
+        }
+        if (incompleteBtn) {
+          incompleteBtn.addEventListener('click', () => {
+            FFTasks.markIncomplete(taskId);
+            FFUtils.toast('Task reopened', 'default');
+            render();
+          });
+        }
+
+        // Delete task
+        document.getElementById('deleteTaskBtn').addEventListener('click', () => {
+          if (window.confirm('Delete this task? This cannot be undone.')) {
+            FFTasks.remove(taskId);
+            FFUtils.toast('Task deleted', 'default');
+            window.location.href = 'taskboard.html';
+          }
+        });
+      }
+
+      // ── Mount TaskModal (React) ────────────────────────
+      const modalRoot = ReactDOM.createRoot(document.getElementById('task-modal-root'));
+
+      function mountModal() {
+        modalRoot.render(
+          React.createElement(TaskModal, {
+            editTask: task,
+            onSave: () => {
+              const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
+              if (modal) modal.hide();
+              FFUtils.toast('Task updated', 'success');
+              render();
+              setTimeout(mountModal, 300);
+            },
+            onClose: () => setTimeout(mountModal, 300),
+          })
+        );
+      }
+
+      document.getElementById('editTaskBtn').addEventListener('click', mountModal);
+
+      // ── Initial render ─────────────────────────────────
+      render();
+
+    });
+  </script>
+
+</body>
+</html>

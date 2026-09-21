@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FocusFlow — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/webfont/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="css/tokens.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/animations.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-4); }
+    .tasks-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-4); }
+    .energy-card { background:var(--color-white); border:1px solid var(--color-neutral-200); border-radius:var(--radius-lg); padding:var(--space-5); }
+    .section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:var(--space-4); }
+    .section-title { font-size:15px; font-weight:var(--font-weight-semibold); color:var(--color-neutral-900); margin-bottom:2px; }
+    .section-sub { font-size:var(--font-size-xs); color:var(--color-neutral-500); }
+    .empty-state { text-align:center; padding:var(--space-10) var(--space-6); color:var(--color-neutral-500); }
+    .empty-state i { font-size:40px; margin-bottom:12px; color:var(--color-neutral-200); }
+    @media(max-width:900px){ .stat-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:640px){ .stat-grid{ grid-template-columns:1fr 1fr; } .tasks-grid{ grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+  <div class="ff-app-shell">
+    <aside class="ff-sidebar" role="navigation" aria-label="Main navigation">
+      <a href="dashboard.html" class="ff-sidebar-logo">FocusFlow</a>
+      <nav class="ff-sidebar-nav">
+        <a href="dashboard.html"  class="ff-nav-item active" data-nav="dashboard"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</a>
+        <a href="taskboard.html"  class="ff-nav-item" data-nav="taskboard"><i class="ti ti-layout-kanban" aria-hidden="true"></i>Task board</a>
+        <a href="focusmode.html"  class="ff-nav-item" data-nav="focusmode"><i class="ti ti-player-play" aria-hidden="true"></i>Focus mode</a>
+        <a href="settings.html"   class="ff-nav-item" data-nav="settings"><i class="ti ti-settings" aria-hidden="true"></i>Settings</a>
+      </nav>
+      <div class="ff-sidebar-footer">
+        <div class="ff-avatar js-user-initials" aria-hidden="true">RS</div>
+        <div class="ff-user-info">
+          <div class="ff-user-name js-user-name">Ranuli S.</div>
+          <button class="ff-user-signout js-signout">Sign out</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="ff-main">
+      <header class="ff-topbar">
+        <div>
+          <div class="ff-topbar-title" id="greeting">Good morning, Ranuli</div>
+          <div class="ff-topbar-sub" id="dateDisplay"></div>
+        </div>
+        <button class="ff-btn ff-btn-primary" id="addTaskBtn">
+          <i class="ti ti-plus" aria-hidden="true"></i>Add task
+        </button>
+      </header>
+
+      <div class="ff-page-content">
+        <div class="energy-card mb-4 ff-fade-in">
+          <div id="energy-selector-root"></div>
+        </div>
+        <div class="stat-grid mb-4 ff-stagger" id="statsGrid">
+          <div class="ff-stat-card"><div class="ff-stat-label">Tasks today</div><div class="ff-stat-value" id="statDueToday">—</div><div class="ff-stat-sub" id="statCompletedToday">Loading...</div></div>
+          <div class="ff-stat-card"><div class="ff-stat-label">Incomplete</div><div class="ff-stat-value" id="statIncomplete">—</div><div class="ff-stat-sub">tasks remaining</div></div>
+          <div class="ff-stat-card"><div class="ff-stat-label">Completed</div><div class="ff-stat-value" id="statCompleted">—</div><div class="ff-stat-sub">total tasks done</div></div>
+          <div class="ff-stat-card"><div class="ff-stat-label">This week</div><div class="ff-stat-value" id="statWeek">—</div><div class="ff-stat-sub">completion rate</div></div>
+        </div>
+        <div>
+          <div class="section-header">
+            <div>
+              <div class="section-title">Suggested for you</div>
+              <div class="section-sub" id="suggestedSub">Based on your energy level</div>
+            </div>
+            <a href="taskboard.html" class="ff-btn ff-btn-ghost ff-btn-sm">View all tasks <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+          </div>
+          <div class="tasks-grid ff-stagger" id="suggestedTasks"></div>
+        </div>
+      </div>
+
+      <footer class="ff-footer">
+        <div class="ff-footer-inner">
+          <div class="ff-footer-brand">
+            <span class="ff-footer-logo">FocusFlow</span>
+            <span class="ff-footer-copy">© 2026 FocusFlow. All rights reserved.</span>
+          </div>
+          <div class="ff-footer-links">
+            <a href="#" class="ff-footer-link">Privacy policy</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Terms of use</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Help</a>
+            <div class="ff-footer-divider"></div>
+            <a href="#" class="ff-footer-link">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <nav class="ff-bottom-nav" aria-label="Mobile navigation">
+    <div class="ff-bottom-nav-items">
+      <a href="dashboard.html"  class="ff-bottom-nav-item active"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</a>
+      <a href="taskboard.html"  class="ff-bottom-nav-item"><i class="ti ti-layout-kanban" aria-hidden="true"></i>Tasks</a>
+      <a href="focusmode.html"  class="ff-bottom-nav-item"><i class="ti ti-player-play" aria-hidden="true"></i>Focus</a>
+      <a href="settings.html"   class="ff-bottom-nav-item"><i class="ti ti-settings" aria-hidden="true"></i>Settings</a>
+    </div>
+  </nav>
+
+  <div id="task-modal-root"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/tasks.js"></script>
+
+  <script type="text/babel">
+
+    /* ── EnergySelector ──────────────────────────────────── */
+    const EnergySelector = ({ initialEnergy, onSelect }) => {
+      const [selected, setSelected] = React.useState(initialEnergy || null);
+      const options = [
+        { level:'High',   emoji:'⚡', label:'High',   sub:'Ready for deep, demanding work',            bg:'#FCE8E8', fg:'#8B1515', border:'#8B1515' },
+        { level:'Medium', emoji:'🔆', label:'Medium', sub:'Good for collaborative or focused tasks',    bg:'#FFF5E0', fg:'#7A4F00', border:'#7A4F00' },
+        { level:'Low',    emoji:'🌙', label:'Low',    sub:'Best for quick wins and admin tasks',        bg:'#EEF0F8', fg:'#3A4080', border:'#3A4080' },
+      ];
+      const handleSelect = (level) => { setSelected(level); FF.setSessionEnergy(level); if (onSelect) onSelect(level); };
+      return (
+        <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
+          <div>
+            <p style={{ fontSize:'13px', fontWeight:'600', color:'#1A1A1A', marginBottom:'4px' }}>How's your energy today?</p>
+            <p style={{ fontSize:'12px', color:'#888780', margin:0 }}>We'll surface the right tasks based on how you feel right now.</p>
+          </div>
+          <div style={{ display:'flex', gap:'10px', flexWrap:'wrap' }}>
+            {options.map(opt => {
+              const isSel = selected === opt.level;
+              return (
+                <button key={opt.level} onClick={() => handleSelect(opt.level)}
+                  style={{ flex:'1', minWidth:'100px', padding:'10px 14px', borderRadius:'10px', border: isSel ? `2px solid ${opt.border}` : '1px solid #E0DFDA', background: isSel ? opt.bg : '#FFFFFF', cursor:'pointer', textAlign:'left', transition:'all 0.15s ease', outline:'none', boxShadow: isSel ? `0 0 0 3px ${opt.bg}` : 'none' }}
+                  aria-pressed={isSel} aria-label={`Set energy to ${opt.level}`}>
+                  <div style={{ fontSize:'18px', marginBottom:'4px' }}>{opt.emoji}</div>
+                  <div style={{ fontSize:'13px', fontWeight:'600', color: isSel ? opt.fg : '#1A1A1A', marginBottom:'2px' }}>{opt.label}</div>
+                  <div style={{ fontSize:'11px', color: isSel ? opt.fg : '#888780', lineHeight:1.4 }}>{opt.sub}</div>
+                </button>
+              );
+            })}
+          </div>
+          {selected && (
+            <div style={{ display:'flex', alignItems:'center', gap:'6px', fontSize:'12px', color:'#2DAB72', fontWeight:'500' }}>
+              <i className="ti ti-circle-check" aria-hidden="true"></i> Energy set to {selected} — tasks updated below.
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    /* ── TaskModal ───────────────────────────────────────── */
+    const TaskModal = ({ editTask, onSave, onClose }) => {
+      const isEdit = !!editTask;
+      const [form, setForm] = React.useState({ title:editTask?.title||'', description:editTask?.description||'', focusType:editTask?.focusType||'Quick Win', energyLevel:editTask?.energyLevel||'Medium', dueDate:editTask?.dueDate||'' });
+      const [errors, setErrors] = React.useState({});
+      const focusTypes = ['Deep Work','Quick Win','Collaborative','Admin'];
+      const energyLevels = ['High','Medium','Low'];
+      const handleChange = (field, value) => { setForm(prev => ({...prev,[field]:value})); if (errors[field]) setErrors(prev => ({...prev,[field]:''})); };
+      const validate = () => { const e={}; if (!form.title.trim()) e.title='Task title is required.'; return e; };
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const errs = validate();
+        if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+        const taskData = { title:form.title.trim(), description:form.description.trim(), focusType:form.focusType, energyLevel:form.energyLevel, dueDate:form.dueDate||null };
+        if (isEdit) { FFTasks.update(editTask.id, taskData); } else { FFTasks.add(taskData); }
+        if (onSave) onSave();
+      };
+      const iStyle = (f) => ({ width:'100%', padding:'10px 14px', border:`1px solid ${errors[f]?'#E84040':'#1A1A1A'}`, borderRadius:'8px', fontSize:'13px', fontFamily:'Inter,sans-serif', color:'#1A1A1A', background:errors[f]?'#FCE8E8':'#FFFFFF', outline:'none', boxSizing:'border-box' });
+      const lStyle = { display:'block', fontSize:'12px', fontWeight:'500', color:'#1A1A1A', marginBottom:'6px' };
+      const focusBadgeColors = { 'Deep Work':{bg:'#EEEDFE',fg:'#3C3489'}, 'Quick Win':{bg:'#E1F5EE',fg:'#085041'}, 'Collaborative':{bg:'#FAEEDA',fg:'#633806'}, 'Admin':{bg:'#FAECE7',fg:'#712B13'} };
+      const energyColors = { 'High':{bg:'#FCE8E8',fg:'#8B1515'}, 'Medium':{bg:'#FFF5E0',fg:'#7A4F00'}, 'Low':{bg:'#EEF0F8',fg:'#3A4080'} };
+      return (
+        <div className="modal fade" id="taskModal" tabIndex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content" style={{ borderRadius:'16px', border:'1px solid #E0DFDA', overflow:'hidden' }}>
+              <div className="modal-header" style={{ borderBottom:'1px solid #E0DFDA', padding:'20px 24px' }}>
+                <h2 id="taskModalLabel" style={{ fontSize:'16px', fontWeight:'700', color:'#1A1A1A', margin:0 }}>{isEdit ? 'Edit task' : 'Add new task'}</h2>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={onClose}></button>
+              </div>
+              <div className="modal-body" style={{ padding:'24px' }}>
+                <form id="taskForm" onSubmit={handleSubmit} noValidate>
+                  <div style={{ marginBottom:'16px' }}>
+                    <label style={lStyle} htmlFor="taskTitle">Task title <span style={{color:'#E84040'}}>*</span></label>
+                    <input style={iStyle('title')} type="text" id="taskTitle" placeholder="What needs to be done?" value={form.title} onChange={e => handleChange('title',e.target.value)} maxLength={100} autoFocus/>
+                    {errors.title && <div style={{ fontSize:'11px', color:'#E84040', marginTop:'4px' }}>{errors.title}</div>}
+                  </div>
+                  <div style={{ marginBottom:'16px' }}>
+                    <label style={lStyle} htmlFor="taskDesc">Description</label>
+                    <textarea style={{...iStyle('description'), minHeight:'72px', resize:'vertical'}} id="taskDesc" placeholder="Add more context or notes..." value={form.description} onChange={e => handleChange('description',e.target.value)} maxLength={500}/>
+                  </div>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px', marginBottom:'16px' }}>
+                    <div>
+                      <label style={lStyle} htmlFor="taskFocusType">Focus type <span style={{color:'#E84040'}}>*</span></label>
+                      <select style={iStyle('focusType')} id="taskFocusType" value={form.focusType} onChange={e => handleChange('focusType',e.target.value)}>
+                        {focusTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
+                      {form.focusType && <span style={{ display:'inline-flex', marginTop:'6px', padding:'3px 10px', borderRadius:'20px', fontSize:'11px', fontWeight:'500', background:focusBadgeColors[form.focusType]?.bg, color:focusBadgeColors[form.focusType]?.fg }}>{form.focusType}</span>}
+                    </div>
+                    <div>
+                      <label style={lStyle} htmlFor="taskEnergy">Energy level <span style={{color:'#E84040'}}>*</span></label>
+                      <select style={iStyle('energyLevel')} id="taskEnergy" value={form.energyLevel} onChange={e => handleChange('energyLevel',e.target.value)}>
+                        {energyLevels.map(l => <option key={l} value={l}>{l}</option>)}
+                      </select>
+                      {form.energyLevel && <span style={{ display:'inline-flex', marginTop:'6px', padding:'3px 10px', borderRadius:'20px', fontSize:'11px', fontWeight:'500', background:energyColors[form.energyLevel]?.bg, color:energyColors[form.energyLevel]?.fg }}>{form.energyLevel} energy</span>}
+                    </div>
+                  </div>
+                  <div style={{ marginBottom:'8px' }}>
+                    <label style={lStyle} htmlFor="taskDueDate">Due date <span style={{color:'#888780',fontWeight:'400'}}>(optional)</span></label>
+                    <input style={iStyle('dueDate')} type="date" id="taskDueDate" value={form.dueDate} onChange={e => handleChange('dueDate',e.target.value)} min={new Date().toISOString().split('T')[0]}/>
+                  </div>
+                </form>
+              </div>
+              <div className="modal-footer" style={{ borderTop:'1px solid #E0DFDA', padding:'16px 24px', gap:'10px' }}>
+                <button type="button" data-bs-dismiss="modal" onClick={onClose} style={{ padding:'9px 20px', borderRadius:'8px', border:'1px solid #E0DFDA', background:'#F7F6F3', fontSize:'13px', fontWeight:'500', color:'#888780', cursor:'pointer', fontFamily:'Inter,sans-serif' }}>Cancel</button>
+                <button type="submit" form="taskForm" style={{ padding:'9px 24px', borderRadius:'8px', border:'none', background:'#7F77DD', fontSize:'13px', fontWeight:'500', color:'#FFFFFF', cursor:'pointer', fontFamily:'Inter,sans-serif' }}>{isEdit ? 'Save changes' : 'Add task'}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    /* ── Page logic ──────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!FF.requireAuth()) return;
+      FFUtils.populateSidebar('dashboard');
+
+      const user = FF.getCurrentUser();
+      document.getElementById('greeting').textContent = `${FFUtils.formatGreeting()}, ${user.name.split(' ')[0]} 👋`;
+      document.getElementById('dateDisplay').textContent = FFUtils.formatDate();
+
+      function updateStats() {
+        const stats = FFTasks.getStats();
+        document.getElementById('statDueToday').textContent      = stats.dueToday;
+        document.getElementById('statCompletedToday').textContent = `${stats.completedToday} completed today`;
+        document.getElementById('statIncomplete').textContent    = stats.incomplete;
+        document.getElementById('statCompleted').textContent     = stats.completed;
+        document.getElementById('statWeek').textContent          = stats.weekCompletion + '%';
+      }
+
+      function renderSuggestedTasks(energy) {
+        const tasks     = FFTasks.getAll();
+        const suggested = FFUtils.suggestTasks(tasks, energy);
+        const container = document.getElementById('suggestedTasks');
+        const subLabel  = document.getElementById('suggestedSub');
+        subLabel.textContent = energy ? `Based on your ${energy} energy level` : 'Set your energy above to get personalised suggestions';
+        if (suggested.length === 0) {
+          container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-check" aria-hidden="true"></i><p>All tasks are complete — great work!</p></div>`;
+          return;
+        }
+        container.innerHTML = suggested.map(task => FFUtils.buildTaskCardHTML(task, true)).join('');
+        container.querySelectorAll('.js-start-focus').forEach(btn => {
+          btn.addEventListener('click', e => { e.stopPropagation(); FFUtils.goToFocus(btn.dataset.taskId); });
+        });
+        container.querySelectorAll('.js-view-task').forEach(btn => {
+          btn.addEventListener('click', e => { e.stopPropagation(); FFUtils.goToTask(btn.dataset.taskId); });
+        });
+        container.querySelectorAll('.ff-task-card').forEach(card => {
+          card.addEventListener('click', () => FFUtils.goToTask(card.dataset.taskId));
+        });
+      }
+
+      const savedEnergy = FF.getSessionEnergy();
+      updateStats();
+      renderSuggestedTasks(savedEnergy);
+
+      const energyRoot = ReactDOM.createRoot(document.getElementById('energy-selector-root'));
+      energyRoot.render(
+        React.createElement(EnergySelector, {
+          initialEnergy: savedEnergy,
+          onSelect: (level) => { renderSuggestedTasks(level); updateStats(); FFUtils.toast(`Energy set to ${level}`, 'success'); }
+        })
+      );
+
+      let editingTask = null;
+      const modalRoot = ReactDOM.createRoot(document.getElementById('task-modal-root'));
+
+      function mountModal() {
+        modalRoot.render(
+          React.createElement(TaskModal, {
+            editTask: editingTask,
+            onSave: () => {
+              const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
+              if (modal) modal.hide();
+              updateStats();
+              renderSuggestedTasks(FF.getSessionEnergy());
+              FFUtils.toast(editingTask ? 'Task updated' : 'Task added', 'success');
+              editingTask = null;
+              setTimeout(mountModal, 300);
+            },
+            onClose: () => { editingTask = null; setTimeout(mountModal, 300); }
+          })
+        );
+      }
+
+      mountModal();
+
+      document.getElementById('addTaskBtn').addEventListener('click', () => {
+        editingTask = null;
+        mountModal();
+        const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+        modal.show();
+      });
+    });
+
+  </script>
+
+</body>
+</html>
+
