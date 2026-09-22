@@ -128,8 +128,6 @@
         <button
           class="ff-btn ff-btn-ghost ff-btn-sm"
           id="editTaskBtn"
-          data-bs-toggle="modal"
-          data-bs-target="#taskModal"
         >
           <i class="ti ti-edit" aria-hidden="true"></i> Edit task
         </button>
@@ -185,10 +183,10 @@
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/tasks.js"></script>
-  <script type="text/babel" src="js/components/TaskModal.js"></script>
+  <script type="text/babel" src="js/TaskModal.js"></script>
 
   <script type="text/babel">
-    document.addEventListener('DOMContentLoaded', () => {
+    (() => {
 
       if (!FF.requireAuth()) return;
       FFUtils.populateSidebar('taskboard');
@@ -425,29 +423,44 @@
       // ── Mount TaskModal (React) ────────────────────────
       const modalRoot = ReactDOM.createRoot(document.getElementById('task-modal-root'));
 
+      function getBsModal() {
+        return bootstrap.Modal.getOrCreateInstance(document.getElementById('taskModal'));
+      }
+
+      // Bumped every time the modal is (re)opened, and used as TaskModal's
+      // `key` — forces React to remount it with fresh internal form state
+      // instead of reusing a previous open's (possibly edited/cancelled) state.
+      let modalOpenSeq = 0;
+
       function mountModal() {
         modalRoot.render(
           React.createElement(TaskModal, {
+            key: modalOpenSeq,
             editTask: task,
             onSave: () => {
-              const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
-              if (modal) modal.hide();
+              getBsModal().hide();
               FFUtils.toast('Task updated', 'success');
               render();
-              setTimeout(mountModal, 300);
             },
-            onClose: () => setTimeout(mountModal, 300),
+            onClose: () => getBsModal().hide(),
           })
         );
       }
 
-      document.getElementById('editTaskBtn').addEventListener('click', mountModal);
+      document.getElementById('editTaskBtn').addEventListener('click', () => {
+        modalOpenSeq++;
+        mountModal();
+        requestAnimationFrame(() => {
+          getBsModal().show();
+        });
+      });
 
       // ── Initial render ─────────────────────────────────
       render();
 
-    });
+    })();
   </script>
 
 </body>
 </html>
+
