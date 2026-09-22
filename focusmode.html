@@ -202,10 +202,10 @@
   <script src="js/auth.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/tasks.js"></script>
-  <script type="text/babel" src="js/components/Timer.js"></script>
+  <script type="text/babel" src="js/Timer.js"></script>
 
   <script type="text/babel">
-    document.addEventListener('DOMContentLoaded', () => {
+    (() => {
 
       if (!FF.requireAuth()) return;
       FFUtils.populateSidebar('focusmode');
@@ -267,8 +267,9 @@
         }
       });
 
-    });
+    })();
   </script>
 
 </body>
 </html>
+
