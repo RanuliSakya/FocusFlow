@@ -267,16 +267,27 @@
     };
 
     /* ── Page logic ──────────────────────────────────────── */
-    document.addEventListener('DOMContentLoaded', () => {
+    (() => {
       if (!FF.requireAuth()) return;
       FFUtils.populateSidebar('taskboard');
 
-      let refreshKey  = 0;
-      let editingTask = null;
+      let refreshKey = 0;
+      const modalState = { editingTask: null };
+      // Bumped every time the modal is (re)opened, and used as TaskModal's
+      // `key` — forces React to remount it with fresh internal form state
+      // instead of reusing the previous open's state (stale title/fields).
+      let modalOpenSeq = 0;
+
+      // Look up (or lazily create) the Bootstrap modal instance on demand,
+      // instead of caching it once — avoids races with React's async render.
+      function getBsModal() {
+        return bootstrap.Modal.getOrCreateInstance(document.getElementById('taskModal'));
+      }
 
       const boardRoot = ReactDOM.createRoot(document.getElementById('taskboard-root'));
       const modalRoot = ReactDOM.createRoot(document.getElementById('task-modal-root'));
 
+      // ── TaskBoard ─────────────────────────────────────────
       function renderBoard() {
         refreshKey++;
         boardRoot.render(
@@ -285,43 +296,51 @@
             onTaskView:   (id) => FFUtils.goToTask(id),
             onTaskFocus:  (id) => FFUtils.goToFocus(id),
             onTaskEdit:   (task) => {
-              editingTask = task;
+              modalState.editingTask = task;
+              modalOpenSeq++;
               renderModal();
-              const modal = new bootstrap.Modal(document.getElementById('taskModal'));
-              modal.show();
+              // rAF gives React one frame to flush before Bootstrap shows
+              requestAnimationFrame(() => {
+                getBsModal().show();
+              });
             },
             onTaskDelete: () => { FFUtils.toast('Task deleted', 'default'); renderBoard(); },
           })
         );
       }
 
+      // ── TaskModal — re-rendered with a fresh `key` each time so its
+      // internal form state never leaks between "Add" and "Edit" opens ─
       function renderModal() {
         modalRoot.render(
           React.createElement(TaskModal, {
-            editTask: editingTask,
+            key: modalOpenSeq,
+            editTask: modalState.editingTask,
             onSave: () => {
-              const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
-              if (modal) modal.hide();
-              FFUtils.toast(editingTask ? 'Task updated' : 'Task added', 'success');
-              editingTask = null;
+              getBsModal().hide();
+              FFUtils.toast(modalState.editingTask ? 'Task updated' : 'Task added', 'success');
+              modalState.editingTask = null;
               renderBoard();
-              setTimeout(renderModal, 300);
             },
-            onClose: () => { editingTask = null; setTimeout(renderModal, 300); },
+            onClose: () => { modalState.editingTask = null; },
           })
         );
       }
 
+      // Add task button — clear edit state, re-render, then show
       document.getElementById('addTaskBtn').addEventListener('click', () => {
-        editingTask = null;
+        modalState.editingTask = null;
+        modalOpenSeq++;
         renderModal();
-        const modal = new bootstrap.Modal(document.getElementById('taskModal'));
-        modal.show();
+        requestAnimationFrame(() => {
+          getBsModal().show();
+        });
       });
 
+      // Initial render — board + modal both mount once
       renderBoard();
       renderModal();
-    });
+    })();
 
   </script>
 
