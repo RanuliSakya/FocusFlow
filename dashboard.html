@@ -231,7 +231,7 @@
     };
 
     /* ── Page logic ──────────────────────────────────────── */
-    document.addEventListener('DOMContentLoaded', () => {
+    (() => {
       if (!FF.requireAuth()) return;
       FFUtils.populateSidebar('dashboard');
 
@@ -282,36 +282,56 @@
         })
       );
 
-      let editingTask = null;
+      // ── Modal state ───────────────────────────────────────
+      // We use a shared ref object so TaskModal can always read the
+      // latest editingTask without needing to be re-mounted.
+      const modalState = { editingTask: null };
+      // Bumped every time the modal is (re)opened, and used as TaskModal's
+      // `key` — forces React to remount it with fresh internal form state
+      // instead of reusing the previous open's state (stale title/fields).
+      let modalOpenSeq = 0;
+
+      // Look up (or lazily create) the Bootstrap modal instance on demand,
+      // instead of caching it once — avoids races with React's async render.
+      function getBsModal() {
+        return bootstrap.Modal.getOrCreateInstance(document.getElementById('taskModal'));
+      }
+
+      // Mount TaskModal ONCE on page load. It stays in the DOM forever.
+      // We never re-render it on button click — only show/hide via Bootstrap.
       const modalRoot = ReactDOM.createRoot(document.getElementById('task-modal-root'));
 
       function mountModal() {
         modalRoot.render(
           React.createElement(TaskModal, {
-            editTask: editingTask,
+            key: modalOpenSeq,
+            editTask: modalState.editingTask,
             onSave: () => {
-              const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
-              if (modal) modal.hide();
+              getBsModal().hide();
               updateStats();
               renderSuggestedTasks(FF.getSessionEnergy());
-              FFUtils.toast(editingTask ? 'Task updated' : 'Task added', 'success');
-              editingTask = null;
-              setTimeout(mountModal, 300);
+              FFUtils.toast(modalState.editingTask ? 'Task updated' : 'Task added', 'success');
+              modalState.editingTask = null;
             },
-            onClose: () => { editingTask = null; setTimeout(mountModal, 300); }
+            onClose: () => { modalState.editingTask = null; }
           })
         );
       }
 
+      // Mount once — this puts #taskModal into the DOM
       mountModal();
 
+      // On click: update state, re-render with new props, then show
       document.getElementById('addTaskBtn').addEventListener('click', () => {
-        editingTask = null;
+        modalState.editingTask = null;
+        modalOpenSeq++;
         mountModal();
-        const modal = new bootstrap.Modal(document.getElementById('taskModal'));
-        modal.show();
+        // One rAF gives React time to flush the render before Bootstrap shows
+        requestAnimationFrame(() => {
+          getBsModal().show();
+        });
       });
-    });
+    })();
 
   </script>
 
